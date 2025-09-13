@@ -1,5 +1,6 @@
 const multer = require("multer");
 const path = require("path");
+const { FILE_CONSTRAINTS } = require("../utils/constants");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -22,10 +23,17 @@ const fileFilter = (req, file, cb) => {
   if (ext && mime) {
     cb(null, true);
   } else {
-    cb(new Error(" Только изображения (jpeg, jpg, png, webp)"));
+    cb(new Error("Только изображения (jpeg, jpg, png, webp)"));
   }
 };
 
-const upload = multer({ storage, fileFilter });
+const upload = multer({ 
+  storage, 
+  fileFilter,
+  limits: {
+    fileSize: parseInt(process.env.MAX_FILE_SIZE) || FILE_CONSTRAINTS.MAX_SIZE,
+    files: 1 // Только один файл за раз
+  }
+});
 
 module.exports = upload;
